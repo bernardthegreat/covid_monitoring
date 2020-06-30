@@ -2,7 +2,7 @@ import 'package:covid_monitoring/models/PUIProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class PUIForm extends StatefulWidget {
   PUIForm({Key key}) : super(key: key);
@@ -12,6 +12,7 @@ class PUIForm extends StatefulWidget {
 }
 
 class _PUIFormState extends State<PUIForm> {
+  bool _isLoading = false;
   final GlobalKey<FormBuilderState> _formKey = GlobalKey<FormBuilderState>();
 
   @override
@@ -19,10 +20,23 @@ class _PUIFormState extends State<PUIForm> {
     
 
     _savePUIForm({BuildContext context}) async {
+        setState(() {
+        _isLoading = true;
+      });
+
       if (_formKey.currentState.saveAndValidate()) {
         var formVals = _formKey.currentState.value;
 
-        print(formVals);
+        final response =
+          await Provider.of<PUIProvider>(context, listen: false)
+              .savePUIForm(formVals);
+
+        if (response['error'] != null) {
+          setState(() {
+            _isLoading = false;
+          });
+          return;
+        }
       }
     }
 
@@ -85,16 +99,21 @@ class _PUIFormState extends State<PUIForm> {
                       return Text('');
                   }
                 }).toList(),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: RaisedButton.icon(
-                    onPressed: () {
-                      _savePUIForm();
-                    },
-                    icon: Icon(FontAwesomeIcons.save),
-                    label: Text('Save'),
+
+                _isLoading
+                ? 
+                  CircularProgressIndicator()
+                :
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: RaisedButton.icon(
+                      onPressed: () {
+                        _savePUIForm();
+                      },
+                      icon: Icon(FontAwesomeIcons.save),
+                      label: Text('Save'),
+                    ),
                   ),
-                ),
               ],
             ),
           ),
