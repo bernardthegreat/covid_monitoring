@@ -17,20 +17,17 @@ class _PUIFormState extends State<PUIForm> {
 
   @override
   Widget build(BuildContext context) {
-    
 
-    _savePUIForm({BuildContext context}) async {
-        setState(() {
+    _savePUIForm() async {
+      setState(() {
         _isLoading = true;
       });
 
       if (_formKey.currentState.saveAndValidate()) {
         var formVals = _formKey.currentState.value;
-
-        final response =
-          await Provider.of<PUIProvider>(context, listen: false)
-              .savePUIForm(formVals);
-
+        final response = await Provider.of<PUIProvider>(context, listen: false)
+            .savePUIForm(formVals);
+        
         if (response['error'] != null) {
           setState(() {
             _isLoading = false;
@@ -38,6 +35,11 @@ class _PUIFormState extends State<PUIForm> {
           return;
         }
       }
+
+      setState(() {
+        _isLoading = false;
+      });
+
     }
 
     return FormBuilder(
@@ -76,6 +78,7 @@ class _PUIFormState extends State<PUIForm> {
                         firstDate: item['firstDate'],
                         decoration: InputDecoration(labelText: item['label']),
                         validators: [...item['validators']],
+                        initialValue: DateTime.now(),
                       );
                     case FormBuilderDropdown:
                       return FormBuilderDropdown(
@@ -99,21 +102,18 @@ class _PUIFormState extends State<PUIForm> {
                       return Text('');
                   }
                 }).toList(),
-
                 _isLoading
-                ? 
-                  CircularProgressIndicator()
-                :
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: RaisedButton.icon(
-                      onPressed: () {
-                        _savePUIForm();
-                      },
-                      icon: Icon(FontAwesomeIcons.save),
-                      label: Text('Save'),
-                    ),
-                  ),
+                    ? CircularProgressIndicator()
+                    : Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: RaisedButton.icon(
+                          onPressed: () {
+                            _savePUIForm();
+                          },
+                          icon: Icon(FontAwesomeIcons.save),
+                          label: Text('Save'),
+                        ),
+                      ),
               ],
             ),
           ),

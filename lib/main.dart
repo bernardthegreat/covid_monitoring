@@ -19,8 +19,8 @@ class MyApp extends StatelessWidget {
         // ChangeNotifierProvider(
         //   create: (_) => AuthProvider(),
         // ),
-        ChangeNotifierProvider(
-          create: (_) => PUIProvider(),
+        ChangeNotifierProvider<PUIProvider>(
+          create: (context) => PUIProvider(),
         ),
       ],
       child: MaterialApp(
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
               buttonColor: Colors.blue, textTheme: ButtonTextTheme.primary),
         ),
         routes: {
-          '/': (_) => PUIScreen(),
+          '/': (BuildContext context) => PUIScreen(),
         },
       ),
     );
